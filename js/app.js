@@ -23,7 +23,7 @@ function createCityList(){
      var city = cities[i];
      list.innerHTML += '\
       <li>\
-        <input type="checkbox"  class="citybox" onChange="showCity(this)" value="'+city+'">{{ city }}</input> \
+        <input type="checkbox"  class="citybox" onChange="showCity(this)" value="'+city+'">'+city+'</input> \
       </li>\
    ';
    }
