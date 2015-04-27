@@ -15,13 +15,8 @@
 						<input type="checkbox" value="grocery" name="loctype">Bike Repair</input>
 					</div> -->
 					<br>
-					<div style="float: right;   float: right;display: inline;width: 25%;">
-						<ol>
-						{% for city in cities %}
-							<li>
-							<input type="checkbox"  class="citybox" onChange="showCity(this)" value="{{city}}">{{ city }}</input>	
-							</li>
-						{% endfor %}
+					<div style="float: right;   float: right;display: inline;width: 25%;" >
+						<ol id="cities-list">						
 						<ol>
 					</div>
 					<script>
