@@ -21,7 +21,7 @@ function createCityList(){
    /*jshint multistr: true */
    for (var i = 0; i < cities.length; i++) {
      var city = cities[i];
-     list.innerHYML += '\
+     list.innerHTML += '\
       <li>\
         <input type="checkbox"  class="citybox" onChange="showCity(this)" value="'+city+'">{{ city }}</input> \
       </li>\
