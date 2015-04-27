@@ -13,30 +13,23 @@ function initialize() {
  geocoder = new google.maps.Geocoder();
  currentLocation = new google.maps.LatLng(-34.397, 150.644);
  success(undefined);
-  // if (navigator.geolocation) {
-  //   navigator.geolocation.getCurrentPosition(success, error);
-  // } else {
-  //   alert('geolocation not supported');
-  // }
-
+ createCityList(); 
 }
 
-// function search(){
-//   var text= 'restaurant';  
-//   if(text===""){    
-//     clearMakers();
-//     return;
-//   }
-//   console.log(currentLocation)
-//   var request = {
-//     location: currentLocation,
-//     radius: 500,
-//     query: text
-//   };
+function createCityList(){
+   var list =document.getElementById('cities-list');
+   /*jshint multistr: true */
+   for (var i = 0; i < cities.length; i++) {
+     var city = cities[i];
+     list.innerHYML += '\
+      <li>\
+        <input type="checkbox"  class="citybox" onChange="showCity(this)" value="'+city+'">{{ city }}</input> \
+      </li>\
+   ';
+   }
+}
 
-//   service = new google.maps.places.PlacesService(map);
-//   service.textSearch(request, callback);
-// }
+
 function success(position) {
   // currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);    
   mapoptions = {
@@ -59,6 +52,7 @@ function error(msg) {
 
 
 function createMaker(place,types){
+  var image = "";
   if(contains(types,'bicycle_store') ){
     image = '/img/repair.png';
   }else if(contains(types,'restaurant')){
@@ -115,21 +109,7 @@ function calcRoute() {
   });
 }
 
-// function displayRestaurants(){
-  
-//   var start = new Date().getTime();
-//   for (var i = 0; i < cities.length; i++) {
-//     for (var j = 0; j < 1e7; j++) {
-//       if ((new Date().getTime() - start) > 2000){
-//         break;
-//       }
-//     }
-//     searchAt(cities[i],'restaurant');
-//     console.log(i);    
-//     start = new Date().getTime();
-//   }
 
-// }
 
 
  function searchAt(cityName,type) {
