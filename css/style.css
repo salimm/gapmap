@@ -23,19 +23,21 @@
     height: 100%;
 }
 #map-container.open {
-    width: 70%;
+    width: 60%;
 }
 #sidebar.open {
     display: inline;
     float:right;
-    width: 30%;
+    width: 40%;
 }
 #toggle-button.open {
     display: none;
 }
 #toggle-button {
-    position: absolute;
+    position: fixed;
     display: block;
+    right: 10px;
+    bottom: 10px;
 }
 button{
     font-size: 25px;
