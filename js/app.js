@@ -8,8 +8,12 @@ var markers=[];
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var elevInfowindow = new google.maps.InfoWindow();
+
 MAX_DISTANCE = 10000;
-cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
+
+cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
+legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'}
+
 var geocoder;
 var weatherLayer;
 var cloudLayer;
@@ -19,25 +23,35 @@ function initialize() {
     geocoder = new google.maps.Geocoder();
     currentLocation = new google.maps.LatLng(-34.397, 150.644);
     success(undefined);
-    createCityList(); 
-}
-
-function createCityList(){
-    var list =document.getElementById('cities-list');
-    /*jshint multistr: true */
-    for (var i = 0; i < cities.length; i++) {
-        var city = cities[i];
-        list.innerHTML += '\
-        <li>\
-        <input type="checkbox"  class="citybox" onChange="showCity(this)" value="'+city+'">'+city+'</input> \
-        </li>\
-        ';
-    }
+    createLists(); 
 
     // Create an ElevationService
     elevator = new google.maps.ElevationService();
 }
 
+function createLists(){
+    var list = document.getElementById('cities-list');
+    /*jshint multistr: true */
+    for (var i = 0; i < cities.length; i++) {
+        var city = cities[i];
+        list.innerHTML += '\
+        <li>\
+            <input type="checkbox" class="citybox" onChange="showCity(this)" value="'+city+'"> '+city+' </input> \
+        </li>\
+        ';
+    }
+
+    list = document.getElementById('legend-list');
+    for (var key in legend) {
+        if (legend.hasOwnProperty(key)) {
+            list.innerHTML += '\
+            <li> \
+                <img src="' + legend[key] + '"> ' + key + ' \
+            </li>';
+        }
+    }
+    
+}
 
 function success(position) {
     // currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);    
@@ -58,7 +72,7 @@ function success(position) {
     });
     cloudLayer = new google.maps.weather.CloudLayer();
 
-    initializeMenu();
+    // initializeMenu();
 }
 
 function error(msg) {
@@ -67,19 +81,8 @@ function error(msg) {
 
 
 function createMaker(place,types){
-    var image = "";
-    if(contains(types,'bicycle_store') ){
-        image = './img/repair.png';
-    }else if(contains(types,'restaurant')){
-        image = './img/rest.png';
-    }else if(contains(types,'convenience_store') || contains(types,'grocery_or_supermarket') || contains(types,"department_store")){
-        image = './img/groc.png';
-    }else if(contains(types,'campground') || contains(types,'lodging') ){
-        image = './img/camp.png';
-    }else{
-        image =undefined;
-    }
-
+    var image = legend[types];
+    
     var marker = new google.maps.Marker({
         position: place.geometry.location,
         map: map,
@@ -105,7 +108,7 @@ function createMaker(place,types){
 
 function clearMakers(){
     for (var i = 0; i < markers.length; i++) {
-        marker= markers[i];
+        marker = markers[i];
         marker.setMap(null);
     }
     
@@ -135,7 +138,8 @@ function searchAt(element, type) {
     geocoder.geocode( { 'address': address}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
             var loc  = results[0].geometry.location;
-            console.log(loc);
+            // console.log(loc);
+            
             var request = {
                 location: loc,
                 radius: 2000,
@@ -155,7 +159,7 @@ function searchAt(element, type) {
                                 continue;
                             
                             tmp+="<li>"+place.name+" @ "+place.formatted_address+"</li>";
-                            createMaker(place,place.types);            
+                            createMaker(place, type);            
                         }
                     }
                     else {
@@ -169,20 +173,11 @@ function searchAt(element, type) {
 }
 
 function showCity(element){
-    searchAt(element,'restaurant');
-    searchAt(element,'bike repair');
-    searchAt(element,'Grocery Shop');
-    searchAt(element,'Camp Area');
-}
-
-function contains(a, obj) {
-    var i = a.length;
-    while (i--) {
-        if (a[i] === obj) {
-           return true;
+   for (var key in legend) {
+        if (legend.hasOwnProperty(key)) {
+            searchAt(element, key);
         }
-    }
-    return false;
+    } 
 }
 
 function calcDistance(p1, p2){
@@ -221,39 +216,26 @@ function getElevation(event) {
     });
 }
 
-//============================================================================================
-//============================================================================================
-//Menu
-//============================================================================================
-//============================================================================================
+function toggleElevation(element) {
+    if(element.checked) {
+        map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+        // Add a listener for the click event and call getElevation on that location
+        elevListenerHanlde = google.maps.event.addListener(map, 'click', getElevation);
+    } else {
+        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+        google.maps.event.removeListener(elevListenerHanlde);
+    }
+}
 
-function initializeMenu(){
-  $('#elevations-toggle:checkbox').change(
-    function(){
-        elevs = $('#elevations-toggle');
-        if(elevs.is(":checked")){
-            map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+function toggleWeather(element) {
+    if(element.checked) {
+        weatherLayer.setMap(map);          
+        cloudLayer.setMap(map);
+    } else {
+        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+        google.maps.event.removeListener(elevListenerHanlde);
 
-            // Add a listener for the click event and call getElevation on that location
-            elevListenerHanlde =google.maps.event.addListener(map, 'click', getElevation);
-        } else {
-            map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-            google.maps.event.removeListener(elevListenerHanlde);
-        }
-    });
-
-    $('#weather-toggle:checkbox').change(
-    function(){
-        weather = $('#weather-toggle');
-        if(weather.is(":checked")){
-            weatherLayer.setMap(map);          
-            cloudLayer.setMap(map);
-        } else {
-            map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-            google.maps.event.removeListener(elevListenerHanlde);
-
-            weatherLayer.setMap(null);          
-            cloudLayer.setMap(null);
-        }
-    });
+        weatherLayer.setMap(null);          
+        cloudLayer.setMap(null);
+    }
 }
