@@ -23,12 +23,12 @@
     height: 100%;
 }
 #map-container.open {
-    width: 75%;
+    width: 70%;
 }
 #sidebar.open {
     display: inline;
     float:right;
-    width: 25%;
+    width: 30%;
 }
 #toggle-button.open {
     display: none;
