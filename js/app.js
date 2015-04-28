@@ -2,12 +2,18 @@ var map;
 var service;
 var infowindow;
 var currentLocation;
+var elevator;
+var elevListenerHanlde;
 var markers=[];
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
+var elevInfowindow = new google.maps.InfoWindow();
 MAX_DISTANCE = 10000;
 cities = ['Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA'];
 var geocoder;
+var weatherLayer;
+var cloudLayer;
+
 
 function initialize() {
  geocoder = new google.maps.Geocoder();
@@ -27,6 +33,10 @@ function createCityList(){
       </li>\
    ';
    }
+
+   // Create an ElevationService
+  elevator = new google.maps.ElevationService();
+
 }
 
 
@@ -34,14 +44,22 @@ function success(position) {
   // currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);    
   mapoptions = {
         center: currentLocation,
-        zoom: 15
+        zoom: 15,       
       };
+
   map = new google.maps.Map(document.getElementById('map'), mapoptions);
   infoWindow = new google.maps.InfoWindow();
   directionsDisplay = new google.maps.DirectionsRenderer();
   map = new google.maps.Map(document.getElementById("map"), mapoptions);
   directionsDisplay.setMap(map);
   calcRoute();
+  
+  weatherLayer = new google.maps.weather.WeatherLayer({
+     temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT
+  });
+  cloudLayer = new google.maps.weather.CloudLayer();
+
+  initializeMenu();
 }
 
 function error(msg) {
@@ -54,13 +72,13 @@ function error(msg) {
 function createMaker(place,types){
   var image = "";
   if(contains(types,'bicycle_store') ){
-    image = '/img/repair.png';
+    image = './img/repair.png';
   }else if(contains(types,'restaurant')){
-    image = '/img/rest.png';
+    image = './img/rest.png';
   }else if(contains(types,'convenience_store') || contains(types,'grocery_or_supermarket') || contains(types,"department_store")){
-    image = '/img/groc.png';
+    image = './img/groc.png';
   }else if(contains(types,'campground') || contains(types,'lodging') ){
-    image = '/img/camp.png';
+    image = './img/camp.png';
   }else{
     image =undefined;
   }
@@ -169,4 +187,86 @@ function calcRoute() {
 }
 function calcDistance(p1, p2){
   return (google.maps.geometry.spherical.computeDistanceBetween(p1, p2) ).toFixed(2);
+}
+
+function getElevation(event) {
+
+  var locations = [];
+
+  // Retrieve the clicked location and push it on the array
+  var clickedLocation = event.latLng;
+  locations.push(clickedLocation);
+
+  // Create a LocationElevationRequest object using the array's one value
+  var positionalRequest = {
+    'locations': locations
+  };
+
+  // Initiate the location request
+  elevator.getElevationForLocations(positionalRequest, function(results, status) {
+    if (status == google.maps.ElevationStatus.OK) {
+
+      // Retrieve the first result
+      if (results[0]) {
+
+        // Open an info window indicating the elevation at the clicked position
+        elevInfowindow.setContent('The elevation at this point <br>is ' + results[0].elevation + ' meters.');
+        elevInfowindow.setPosition(clickedLocation);
+        elevInfowindow.open(map);
+      } else {
+        alert('No results found');
+      }
+    } else {
+      alert('Elevation service failed due to: ' + status);
+    }
+  });
+}
+
+
+
+
+
+
+
+
+
+
+//============================================================================================
+//============================================================================================
+//Menu
+//============================================================================================
+//============================================================================================
+
+function initializeMenu(){
+  $('#elevations-toggle:checkbox').change(
+    function(){
+        elevs = $('#elevations-toggle');
+        if(elevs.is(":checked")){
+          map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+
+          // Add a listener for the click event and call getElevation on that location
+          elevListenerHanlde =google.maps.event.addListener(map, 'click', getElevation);
+        }else{
+          map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+          google.maps.event.removeListener(elevListenerHanlde);
+        }
+    });
+
+  $('#weather-toggle:checkbox').change(
+    function(){
+        weather = $('#weather-toggle');
+        if(weather.is(":checked")){
+          
+          weatherLayer.setMap(map);          
+          cloudLayer.setMap(map);
+
+        }else{
+          map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+          google.maps.event.removeListener(elevListenerHanlde);
+
+          weatherLayer.setMap(null);          
+          cloudLayer.setMap(null);
+        }
+    });
+
 }
