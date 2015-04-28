@@ -1,5 +1,8 @@
 #sidebar {
     display: none;
+    font-size: 25px;
+    height: 100%;
+    overflow: scroll;
 }
 #sidebar h2{
     text-align: center
@@ -20,12 +23,12 @@
     height: 100%;
 }
 #map-container.open {
-    width: 80%;
+    width: 75%;
 }
 #sidebar.open {
     display: inline;
     float:right;
-    width: 20%;
+    width: 25%;
 }
 #toggle-button.open {
     display: none;
@@ -35,10 +38,8 @@
     display: block;
 }
 button{
-    font-size: 120%;
-}
-input[type="checkbox"] {
-    transform:scale(1.5, 1.5);
+    font-size: 25px;
+    padding: 2px;
 }
 #legend-list{
     transform:scale(0.8, 0.8);   
