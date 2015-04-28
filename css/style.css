@@ -1,15 +1,12 @@
-
 #side-menu{
     list-style:none;
     font-size:14px;
     margin-right: 2%;
 }
-
 #side-menu>span{
     margin-top:15px;
     float:left;
 }
-
 .onoffswitch {
     position: relative; width: 69px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
