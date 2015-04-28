@@ -5,20 +5,23 @@
         <script type="text/javascript" src="js/app.js"></script>
     </head>
     <body>
-        <div id="map-container">
+        <div id="map-container" class="open">
             <div id="map"></div>
         </div>
-        <div id="sidebar" >
+        <div id="sidebar" class="open">
             <h2> GAP Map</h2>
 
             <ul class="no-list">
-                <li><input type="checkbox" id="elevations-toggle" onChange="toggleElevation(this)"> Elevation </li>
-                <li><input type="checkbox" id="weather-toggle" onChange="toggleWeather(this)"> Weather </li>   
+                <label><li><input type="checkbox" id="elevations-toggle" onChange="toggleElevation(this)"> Elevation </li><label>
+                <label><li><input type="checkbox" id="weather-toggle" onChange="toggleWeather(this)"> Weather </li> </label>
             </ul>
             
             <ol id="cities-list"></ol>
-            <ul id="legend-list" class="no-list"></ul>
+            <ul id="legend-list" class="no-list"></ul> <br />
+
+            <button type="button" onclick="toggleSidebar(false)">Close Sidebar</button>
         </div>
+        <button type="button" class="open" id="toggle-button" onclick="toggleSidebar(true)">Show Sidebar</button>
         <script>
             initialize();
         </script>

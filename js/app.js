@@ -36,7 +36,9 @@ function createLists(){
         var city = cities[i];
         list.innerHTML += '\
         <li>\
-            <input type="checkbox" class="citybox" onChange="showCity(this)" value="'+city+'"> '+city+' </input> \
+            <label> \
+                <input type="checkbox" class="citybox" onChange="showCity(this)" value="'+city+'"> '+city+' </input> \
+            </label> \
         </li>\
         ';
     }
@@ -238,4 +240,18 @@ function toggleWeather(element) {
         weatherLayer.setMap(null);          
         cloudLayer.setMap(null);
     }
+}
+
+function toggleSidebar(val) {
+    if (val) {
+        document.getElementById("map-container").classList.add("open");
+        document.getElementById("sidebar").classList.add("open");
+        document.getElementById("toggle-button").classList.add("open");
+    }
+    else {
+        document.getElementById("map-container").classList.remove("open");
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("toggle-button").classList.remove("open");
+    }
+    google.maps.event.trigger(map, "resize");
 }
