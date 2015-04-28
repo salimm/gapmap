@@ -9,7 +9,7 @@ var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var elevInfowindow = new google.maps.InfoWindow();
 MAX_DISTANCE = 10000;
-cities = ['Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA'];
+cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
 var geocoder;
 var weatherLayer;
 var cloudLayer;
@@ -113,7 +113,7 @@ function clearMakers(){
 }
 
 function calcRoute() {
-    var start = 'Pittsburgh, pa';
+    var start = 'Pittsburgh, Pa';
     var end = 'Washington, DC';
     var request = {
         origin:start,
