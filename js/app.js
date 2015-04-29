@@ -38,9 +38,12 @@ function initialize() {
     success(undefined);
     createLists();     
 
-    
-
 }
+
+function initGui(){ 
+  document.getElementById('collapse').onclick = toggleElevationContainer;
+}
+
 
 function initializeMarkersMap(){
   markersMap = {};
@@ -320,8 +323,9 @@ function initElevation(direc){
   var steps = route.legs[0].steps;
   var path = [];
   for (var i = 0; i < steps.length; i++) {
-    var step = steps[i];
+    var step = steps[i];        
     path.push(step.start_point);
+    path.push(step.end_point);
   }
 
    var pathRequest = {
@@ -333,6 +337,22 @@ function initElevation(direc){
   elevator.getElevationAlongPath(pathRequest, plotElevation);
 }
 
+
+
+
+function toggleElevationContainer(){
+
+  var element =document.getElementById('elevation-container');
+  console.log(element.className);
+  if(element.className =='visible-elev'){
+    element.className = '';   
+    chartMarker.setPosition(undefined);
+      chartMarker.setMap(undefined);
+  }else{    
+    element.className = 'visible-elev';
+
+  }
+}
 
 
 // Takes an array of ElevationResult objects, draws the path on the map
@@ -383,11 +403,11 @@ function plotElevation(results, status) {
 
 function chartMouseOver(e){
   chartMarker.setPosition(chartPath[e.row].location);
-  chartMarker.setMap(map);
+  if(chartMarker.map === undefined)
+    chartMarker.setMap(map);
 
 }
 
 function chartMouseOut(e){
-  chartMarker.setPosition(undefined);
-  chartMarker.setMap(undefined);
+
 }
