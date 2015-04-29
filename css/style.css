@@ -1,6 +1,6 @@
 #sidebar {
     display: none;
-    font-size: 25px;
+    font-size: 1.8vw;
     height: 100%;
     overflow: scroll;
 }
@@ -45,4 +45,57 @@ button{
 }
 #legend-list{
     transform:scale(0.8, 0.8);   
+}
+
+
+#elevation{
+  position: absolute;  
+  top:70%;
+  left:0;
+  width:55%;
+  background-color : transparent;
+  z-index:99;
+}
+
+#collapse{
+  width: 3vw;
+  font-size: 2%;
+  
+  
+  background-color: white;
+  padding: 0%;
+  padding-top:3%;
+  padding-bottom:3%;
+  
+  border: solid 1px #BBB;   
+  cursor: hand;
+  float:left;
+
+  border-left: none;
+}
+#collapse>img{
+    width:90%;
+}
+#elevation-container{
+    /*display: none;*/
+    width:100%;
+    height:25vh;        
+    display: none;
+    background-color: white;
+    
+    
+    float left:;
+    border: solid 1px #CCC;
+    -webkit-box-shadow: 10px 10px 33px -11px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 33px -11px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 33px -11px rgba(0,0,0,0.75);
+}
+.visible-elev{
+  display: block !important;  
+}
+.visible-elev + #collapse{
+  
+  float: right;
+  margin-top: -25.3vh;
+  margin-right: -3.1vw;
 }
