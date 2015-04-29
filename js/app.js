@@ -12,7 +12,7 @@ var elevInfowindow = new google.maps.InfoWindow();
 MAX_DISTANCE = 10000;
 
 cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
-legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'}
+legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'};
 
 var geocoder;
 var weatherLayer;
@@ -60,7 +60,11 @@ function success(position) {
     mapoptions = {
         center: currentLocation,
         zoom: 15,       
+        mapTypeControlOptions: {
+            mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
+        },
     };
+
 
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
@@ -234,8 +238,6 @@ function toggleWeather(element) {
         weatherLayer.setMap(map);          
         cloudLayer.setMap(map);
     } else {
-        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-        google.maps.event.removeListener(elevListenerHanlde);
 
         weatherLayer.setMap(null);          
         cloudLayer.setMap(null);
