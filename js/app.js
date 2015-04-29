@@ -18,6 +18,10 @@ var geocoder;
 var weatherLayer;
 var cloudLayer;
 
+var myLocation;
+var gelocationIsActive =false;
+var geointerval ;
+
 var markersMap ;
 
 // Load the Visualization API and the columnchart package.
@@ -186,7 +190,7 @@ function calcRoute() {
         window.directionsResult = result;
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(result);
-            initElevation(result);
+            initElevation(result,false);
         }
     });
 }
@@ -318,14 +322,18 @@ function toggleSidebar(val) {
 }
 
 
-function initElevation(direc){
+function initElevation(direc,limitDistance){
   var route  = direc.routes[0];
   var steps = route.legs[0].steps;
   var path = [];
   for (var i = 0; i < steps.length; i++) {
-    var step = steps[i];        
-    path.push(step.start_point);
-    path.push(step.end_point);
+    var step = steps[i];
+    if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
+      path.push(step.start_point);
+    }
+    if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
+      path.push(step.end_point);
+    }
   }
 
    var pathRequest = {
@@ -334,7 +342,7 @@ function initElevation(direc){
   };
 
   // Initiate the path request.
-  elevator.getElevationAlongPath(pathRequest, plotElevation);
+  elevator.getElevationAlongPath(pathRequest, function(results,status){plotElevation(results,status,'elevation_chart');});
 }
 
 
@@ -350,14 +358,14 @@ function toggleElevationContainer(){
       chartMarker.setMap(undefined);
   }else{    
     element.className = 'visible-elev';
-    document.getElementById('GChart_Frame_0').style.width='100%';
+    // document.getElementById('GChart_Frame_0').style.width='100%';
   }
 }
 
 
 // Takes an array of ElevationResult objects, draws the path on the map
 // and plots the elevation profile on a Visualization API ColumnChart.
-function plotElevation(results, status) {
+function plotElevation(results, status,elementId) {
   chartPath = results;
   if (status != google.maps.ElevationStatus.OK) {
     return;
@@ -387,15 +395,14 @@ function plotElevation(results, status) {
 
 
   // Draw the chart using the data within its DIV.
-  document.getElementById('elevation_chart').style.display = 'block';
-  var w=document.getElementById('elevation_chart').style.width;  
+  document.getElementById(elementId).style.display = 'block';
+  var w=document.getElementById(elementId).style.width;  
   chart.draw(chartData, {
-    height: 150,
+    height: 130,
     width:w,
     legend: 'none',
     titleY: 'Elevation (m)'
   });
-  document.getElementById('GChart_Frame_0').style.width='100%';
 
 
 }
@@ -410,4 +417,29 @@ function chartMouseOver(e){
 
 function chartMouseOut(e){
 
+}
+
+
+function toggleGeolocation(){
+
+  gelocationIsActive = !gelocationIsActive && navigator.geolocation;
+  if(gelocationIsActive){
+
+    geointerval = setInterval(function(){ 
+      updateLocalInfo();
+    }, 1000);
+  }else{
+    clearInterval(geointerval);
+  }
+}
+
+function updateLocalInfo(){
+  
+  navigator.geolocation.getCurrentPosition(function(position) {
+          myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+          map.setCenter(myLocation);
+        }, function() {
+            handleNoGeolocation(browserSupportFlag);
+          } 
+        );
 }
