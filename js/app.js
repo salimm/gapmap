@@ -11,7 +11,7 @@ var elevInfowindow = new google.maps.InfoWindow();
 
 MAX_DISTANCE = 10000;
 
-cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
+cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport, PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
 legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'};
 
 var geocoder;
@@ -350,7 +350,7 @@ function toggleElevationContainer(){
       chartMarker.setMap(undefined);
   }else{    
     element.className = 'visible-elev';
-
+    document.getElementById('GChart_Frame_0').style.width='100%';
   }
 }
 
