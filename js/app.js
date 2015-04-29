@@ -358,11 +358,12 @@ function plotElevation(results, status) {
 
   // Draw the chart using the data within its DIV.
   document.getElementById('elevation_chart').style.display = 'block';
-  var w=document.getElementById('elevation_chart').style.width;
+  var w=document.getElementById('elevation_chart').style.width;  
   chart.draw(data, {
     height: 150,
     width:w,
     legend: 'none',
     titleY: 'Elevation (m)'
   });
+  document.getElementById('GChart_Frame_0').style.width='100%';
 }
