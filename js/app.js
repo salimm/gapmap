@@ -108,8 +108,9 @@ function createMaker(place,types,address){
         position: place.geometry.location,
         map: map,
         title: place.name,
-        icon: image
-    });
+        icon: image,
+        types: types
+    });    
 
 
     google.maps.event.addListener(marker, 'click', function() {
@@ -128,6 +129,13 @@ function createMaker(place,types,address){
     if (markersMap[address]){
       markersMap[address].push(marker);
     }
+}
+
+function displayMarkers(markers){
+  for (var i = 0; i < markers.length; i++) {
+    marker = markers[i];
+    marker.setMap(map);
+  }
 }
 
 function clearAllMakers(){
@@ -206,12 +214,14 @@ function searchAt(element, type) {
 }
 
 function showCity(element){ 
-   if(element.checked){
+   if(element.checked && markersMap[element.value].length ===0){
      for (var key in legend) {
           if (legend.hasOwnProperty(key)) {
               searchAt(element, key);
           }
       } 
+    }else if(element.checked){
+      displayMarkers(markersMap[element.value]);
     }else{
       clearMakers(markersMap[element.value]);
     }
@@ -269,11 +279,11 @@ function toggleWeather(element) {
         weatherLayer.setMap(map);          
         cloudLayer.setMap(map);
     } else {
-
         weatherLayer.setMap(null);          
         cloudLayer.setMap(null);
     }
 }
+
 
 function toggleSidebar(val) {
     if (val) {
