@@ -21,6 +21,7 @@ var cloudLayer;
 var myLocation;
 var gelocationIsActive =false;
 var geointerval ;
+var centerSetOnce=false;
 
 var markersMap ;
 
@@ -366,10 +367,11 @@ function toggleElevationContainer(){
 // Takes an array of ElevationResult objects, draws the path on the map
 // and plots the elevation profile on a Visualization API ColumnChart.
 function plotElevation(results, status,elementId) {
-  chartPath = results;
+  
   if (status != google.maps.ElevationStatus.OK) {
     return;
   }
+  window.chartPath = results;
   var elevations = results;
 
   // Extract the elevation samples from the returned results
@@ -433,14 +435,19 @@ function toggleGeolocation(){
   }else{
     clearInterval(geointerval);
     map.setZoom(7);
+    centerSetOnce =false;
   }
 }
 
 function updateLocalInfo(){
   
   navigator.geolocation.getCurrentPosition(function(position) {
-          myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-          map.setCenter(myLocation);
+          myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
+          if(!centerSetOnce){
+            map.setCenter(myLocation);
+            centerSetOnce=true;
+          }
+
           map.setZoom(13);
           initElevation(window.directionsResult,true,'local_elevation_chart');
         }, function() {
