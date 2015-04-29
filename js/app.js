@@ -18,17 +18,27 @@ var geocoder;
 var weatherLayer;
 var cloudLayer;
 
-var MY_MAPTYPE_ID = 'mymaps';
+var markersMap ;
 
 
 function initialize() {
     geocoder = new google.maps.Geocoder();
+    initializeMarkersMap();
     currentLocation = new google.maps.LatLng(-34.397, 150.644);
     success(undefined);
     createLists(); 
 
     // Create an ElevationService
     elevator = new google.maps.ElevationService();
+
+}
+
+function initializeMarkersMap(){
+  markersMap = {};
+  for (var i = 0; i < cities.length; i++) {
+    var city = cities[i];
+    markersMap[city] = [];
+  }
 }
 
 function createLists(){
@@ -63,6 +73,7 @@ function success(position) {
     mapoptions = {
         center: currentLocation,
         zoom: 15,       
+        mapTypeControl: true,
         mapTypeControlOptions: {
             mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN,google.maps.MapTypeId.SATELLITE],
             style: google.maps.MapTypeControlStyle.DEFAULT
@@ -90,7 +101,7 @@ function error(msg) {
 }
 
 
-function createMaker(place,types){
+function createMaker(place,types,address){
     var image = legend[types];
     
     var marker = new google.maps.Marker({
@@ -114,15 +125,27 @@ function createMaker(place,types){
     });
     
     markers.push(marker);
+    if (markersMap[address]){
+      markersMap[address].push(marker);
+    }
 }
 
-function clearMakers(){
-    for (var i = 0; i < markers.length; i++) {
-        marker = markers[i];
-        marker.setMap(null);
+function clearAllMakers(){
+    clearMakers(markers);
+    emptyList(markers);
+}
+
+function clearMakers(list){
+    for (var i = 0; i < list.length; i++) {
+        marker = list[i];
+        list[i].setMap(null);
     }
-    
-    markers = [];
+      
+}
+function emptyList(list){
+  while (list.length) { 
+      list.pop(); 
+    }
 }
 
 function calcRoute() {
@@ -169,7 +192,7 @@ function searchAt(element, type) {
                                 continue;
                             
                             tmp+="<li>"+place.name+" @ "+place.formatted_address+"</li>";
-                            createMaker(place, type);            
+                            createMaker(place, type,address);            
                         }
                     }
                     else {
@@ -182,12 +205,16 @@ function searchAt(element, type) {
     });
 }
 
-function showCity(element){
-   for (var key in legend) {
-        if (legend.hasOwnProperty(key)) {
-            searchAt(element, key);
-        }
-    } 
+function showCity(element){ 
+   if(element.checked){
+     for (var key in legend) {
+          if (legend.hasOwnProperty(key)) {
+              searchAt(element, key);
+          }
+      } 
+    }else{
+      clearMakers(markersMap[element.value]);
+    }
 }
 
 function calcDistance(p1, p2){
