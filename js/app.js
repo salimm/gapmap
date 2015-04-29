@@ -22,6 +22,7 @@ var myLocation;
 var gelocationIsActive =false;
 var geointerval ;
 var centerSetOnce=false;
+var refreshSpeed = 1000 *60 *2;
 
 var markersMap ;
 
@@ -413,7 +414,7 @@ function plotElevation(results, status,elementId) {
   con.style.display = 'block';
   w= document.getElementById(elementId).offsetWidth;
   con.style.display = 'none';
-  console.log(w);
+  
   charts[index].draw(chartData[index], {
     height: 130,
     width:w,
@@ -442,10 +443,11 @@ function toggleGeolocation(){
 
   gelocationIsActive = !gelocationIsActive && navigator.geolocation;
   if(gelocationIsActive){
-    geointerval = setInterval(function(){ 
+    updateLocalInfo();
+    geointerval = setInterval(function(){       
       updateLocalInfo();
-
-    }, 1000);
+      
+    }, refreshSpeed);
   }else{
     toggleChart('chart_overall');
     clearInterval(geointerval);
@@ -498,4 +500,18 @@ function resizeCharts () {
     initElevation(window.directionsResult,true,'local_elevation_chart');
   if(charts[0]&&document.getElementById('elevation_chart').offsetWidth!=document.getElementById('elevation_chart').children[0].offsetWidth)
     initElevation(window.directionsResult,false,'elevation_chart');
+}
+
+
+
+function toggleSpeed(){
+  console.log('as213');
+  if(refreshSpeed === 1000 *60 *2)
+    refreshSpeed  = 1000 ;
+  else
+    refreshSpeed  =  1000 *60 *2 ;
+    clearInterval(geointerval);
+    geointerval = setInterval(function(){ 
+        updateLocalInfo();
+      }, refreshSpeed);
 }
