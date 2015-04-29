@@ -1,6 +1,6 @@
 #sidebar {
     display: none;
-    font-size: 1.8vw;
+    font-size: 1vw;
     height: 100%;
     overflow: scroll;
 }
@@ -23,12 +23,12 @@
     height: 100%;
 }
 #map-container.open {
-    width: 60%;
+    width: 75%;
 }
 #sidebar.open {
     display: inline;
     float:right;
-    width: 40%;
+    width: 22%;
 }
 #toggle-button.open {
     display: none;
@@ -52,7 +52,7 @@ button{
   position: absolute;  
   top:70%;
   left:0;
-  width:55%;
+  width:75%;
   background-color : transparent;
   z-index:99;
 }
@@ -102,4 +102,87 @@ button{
 
 #elevation_chart{
     width:100%;
+    
+    float: left;
 }
+
+#charts-menu{
+  margin-left: 5%;
+}
+
+#charts-menu>div{
+  float: left;
+  width:15%;
+  font-size: 10px;
+  
+}
+
+
+#charts-menu div {
+  margin: 0 1%;
+  float: left;
+}
+
+#charts-menu label {
+  width: 100%;
+  border-radius: 3px;
+  border: 1px solid #D1D3D4
+}
+
+/* hide input */
+#charts-menu input.radio:empty {
+  margin-left: -999px;
+}
+
+/* style label */
+#charts-menu input.radio:empty ~ label {
+  position: relative;
+  float: left;
+  line-height: 2.5em;
+  text-indent: 1em;
+  margin-top: 0em;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#charts-menu input.radio:empty ~ label:before {
+  
+  float:left;
+  
+  content: '';
+  width: 2.5em;
+  background: #D1D3D4;
+  border-radius: 3px 0 0 3px;
+}
+
+/* toggle hover */
+#charts-menu input.radio:hover:not(:checked) ~ label:before {
+  content:'\2714';
+  text-indent: .9em;
+  color: #C2C2C2;
+}
+
+#charts-menu input.radio:hover:not(:checked) ~ label {
+  color: #888;
+}
+
+/* toggle on */
+#charts-menu input.radio:checked ~ label:before {
+  content:'\2714';
+  text-indent: .9em;
+  color: #9CE2AE;
+  background-color: #4DCB6D;
+}
+
+#charts-menu input.radio:checked ~ label {
+  color: #777;
+}
+
+/* radio focus */
+#charts-menu input.radio:focus ~ label:before {
+  box-shadow: 0 0 0 3px #999;
+}
+
