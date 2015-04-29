@@ -350,7 +350,7 @@ function toggleElevationContainer(){
       chartMarker.setMap(undefined);
   }else{    
     element.className = 'visible-elev';
-
+    document.getElementById('GChart_Frame_0').style.width='100%';
   }
 }
 
