@@ -26,6 +26,8 @@ var refreshSpeed = 1000 *60 *2;
 var myMarker = new google.maps.Marker({
         icon: './img/gear.png',
     });    
+var myDirectionsDisplay;
+var myDirectionsService = new google.maps.DirectionsService();
 
 var markersMap ;
 
@@ -38,6 +40,8 @@ var chartIndex =0;
 var chartMarker = new google.maps.Marker({
         icon: './img/elevmarker.png',
     });    
+
+var tmpMarkers = [];
 
 
 function initialize() {
@@ -106,8 +110,16 @@ function success(position) {
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
     directionsDisplay = new google.maps.DirectionsRenderer();
+    myDirectionsDisplay = new google.maps.DirectionsRenderer({
+    polylineOptions: {
+      strokeColor: "red"
+    }    
+  });
+    myDirectionsDisplay.setOptions( { suppressMarkers: true } );
     map = new google.maps.Map(document.getElementById("map"), mapoptions);
     directionsDisplay.setMap(map);
+    myDirectionsDisplay.setMap(map);
+
     calcRoute();
 
     weatherLayer = new google.maps.weather.WeatherLayer({
@@ -154,6 +166,8 @@ function createMaker(place,types,address){
     }
 }
 
+
+
 function displayMarkers(markers){
   for (var i = 0; i < markers.length; i++) {
     marker = markers[i];
@@ -180,7 +194,7 @@ function emptyList(list){
 }
 
 function calcRoute() {
-    var start = 'Sennot Square, Pittsburgh, Pa';
+    var start = 'Pittsburgh, Pa';
     var end = 'Washington, DC';
     var request = {
         origin:start,
@@ -226,7 +240,7 @@ function searchAt(element, type) {
                                 continue;
                             
                             tmp+="<li>"+place.name+" @ "+place.formatted_address+"</li>";
-                            createMaker(place, type,address);            
+                            createMaker(place, type,address);
                         }
                     }
                     else {
@@ -335,7 +349,7 @@ function initElevation(direc,limitDistance,elementId){
     if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
       path.push(step.start_point);
     }
-    if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
+    if(!limitDistance || calcDistance(step.end_point,myLocation)< MAX_DISTANCE){
       path.push(step.end_point);
     }
   }
@@ -463,6 +477,7 @@ function updateLocalInfo(){
   
   navigator.geolocation.getCurrentPosition(function(position) {
           myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
+          calcMyRoute();
           //update my marker
           updateMyMarker(myLocation);
 
@@ -525,4 +540,67 @@ function toggleSpeed(){
     geointerval = setInterval(function(){ 
         updateLocalInfo();
       }, refreshSpeed);
+}
+
+
+function calcMyRoute(){
+  var route  = window.directionsResult.routes[0];
+  var steps = route.legs[0].steps;
+
+  var minLoc;
+  var minStep;
+  var minD = 999999999;
+  for (var i = 0; i < steps.length; i++) {    
+
+    var step = steps[i];        
+    var d = parseInt(calcDistance(step.start_point,myLocation));
+    if(d < minD){
+      minD = d;
+      minLoc =  step.start_point;  
+      minStep = step;   
+    }
+    d = parseInt(calcDistance(step.end_point,myLocation));
+    if(d< minD){
+      minD = d;
+      minLoc =  step.end_point;   
+      minStep = step;  
+    }
+
+    
+  }
+  if(!(minD < 10000 && minD > 30))
+    return;
+
+  var marker = new google.maps.Marker({
+        position: minLoc,
+        map: map,
+        title: "Trail ",
+        icon: undefined,
+    });    
+
+
+    google.maps.event.addListener(marker, 'click', function() {        
+          // infoWindow.setContent('Intersection with trail<br><a href="http://maps.google.com/maps?daddr='+minLoc.A+','+minLoc.A+'&amp;ll=">Take me there!</a>');
+          infoWindow.setContent('Intersection with trail<br><a href="https://www.google.com/maps/dir/current+location/'+minLoc.A+','+minLoc.F+'">Take me there!</a>');
+          
+          infoWindow.open(map, marker);        
+    });
+
+
+    var request = {
+        origin:myLocation,
+        destination:minLoc,
+        travelMode: google.maps.TravelMode.BICYCLING,
+
+    };
+
+    
+
+    myDirectionsService.route(request, function(result, status) {    
+        
+        if (status == google.maps.DirectionsStatus.OK) {
+            myDirectionsDisplay.setDirections(result);
+            
+        }
+    });
 }
