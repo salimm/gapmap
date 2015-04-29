@@ -27,8 +27,10 @@ var markersMap ;
 
 // Load the Visualization API and the columnchart package.
 google.load('visualization', '1', {packages: ['columnchart']});
-var chart;
-var chartData;
+var charts=[];
+var chartData = [];
+var chartPaths = [];
+var chartIndex =0;
 var chartMarker = new google.maps.Marker({
         icon: './img/elevmarker.png',
     });    
@@ -96,10 +98,7 @@ function success(position) {
             style: google.maps.MapTypeControlStyle.DEFAULT
         },
     };
-    chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
-    google.visualization.events.addListener(chart, 'onmouseover', chartMouseOver);
-    google.visualization.events.addListener(chart, 'onmouseout', chartMouseOut);
-
+    
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
     directionsDisplay = new google.maps.DirectionsRenderer();
@@ -111,8 +110,8 @@ function success(position) {
         temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT
     });
     cloudLayer = new google.maps.weather.CloudLayer();
-
     
+    toggleChart('chart_overall');
 
 }
 
@@ -371,7 +370,19 @@ function plotElevation(results, status,elementId) {
   if (status != google.maps.ElevationStatus.OK) {
     return;
   }
-  window.chartPath = results;
+
+  
+
+  var index =0;
+  if(elementId === 'local_elevation_chart'){
+    index =1;
+  }
+
+  charts[index] = new google.visualization.ColumnChart(document.getElementById(elementId));
+  google.visualization.events.addListener(charts[index], 'onmouseover', chartMouseOver);
+  google.visualization.events.addListener(charts[index], 'onmouseout', chartMouseOut);
+
+  window.chartPaths[index] = results;
   var elevations = results;
 
   // Extract the elevation samples from the returned results
@@ -387,20 +398,23 @@ function plotElevation(results, status,elementId) {
   // Because the samples are equidistant, the 'Sample'
   // column here does double duty as distance along the
   // X axis.
-  chartData = new google.visualization.DataTable();
-  chartData.addColumn('string', 'Sample');
-  chartData.addColumn('number', 'Elevation');
+  chartData[index] = new google.visualization.DataTable();
+  chartData[index].addColumn('string', 'Sample');
+  chartData[index].addColumn('number', 'Elevation');
 
   for (var i = 0; i < results.length; i++) {
-    chartData.addRow([results[i], elevations[i].elevation]);
+    chartData[index].addRow([results[i], elevations[i].elevation]);
   }
 
 
 
   // Draw the chart using the data within its DIV.
-  document.getElementById(elementId).style.display = 'block';
-  var w=document.getElementById(elementId).style.width;  
-  chart.draw(chartData, {
+  con=document.getElementById('elevation-container');  
+  con.style.display = 'block';
+  w= document.getElementById(elementId).offsetWidth;
+  con.style.display = 'none';
+  console.log(w);
+  charts[index].draw(chartData[index], {
     height: 130,
     width:w,
     legend: 'none',
@@ -412,7 +426,8 @@ function plotElevation(results, status,elementId) {
 
 
 function chartMouseOver(e){
-  chartMarker.setPosition(chartPath[e.row].location);
+
+  chartMarker.setPosition(chartPaths[chartIndex][e.row].location);
   if(chartMarker.map === undefined)
     chartMarker.setMap(map);
 
@@ -427,12 +442,12 @@ function toggleGeolocation(){
 
   gelocationIsActive = !gelocationIsActive && navigator.geolocation;
   if(gelocationIsActive){
-
     geointerval = setInterval(function(){ 
       updateLocalInfo();
 
     }, 1000);
   }else{
+    toggleChart('chart_overall');
     clearInterval(geointerval);
     map.setZoom(7);
     centerSetOnce =false;
@@ -454,4 +469,33 @@ function updateLocalInfo(){
             alert('no geo');
           } 
         );
+}
+
+
+function toggleChart(id){
+  hideAll();
+  if(id==='chart_overall'){
+    document.getElementById('radio1').checked=true;
+    document.getElementById('elevation_chart').style.display='block';    
+    chartIndex = 0;
+  }else if(id==='chart_local'){
+    document.getElementById('radio2').checked=true;
+    document.getElementById('local_elevation_chart').style.display='block';  
+    chartIndex = 1;    
+  }
+}
+
+function hideAll(){
+  document.getElementById('local_elevation_chart').style.display='none';
+  document.getElementById('elevation_chart').style.display='none';
+}
+
+window.onresize = resizeCharts;
+
+function resizeCharts () {
+
+  if(charts[1]&&document.getElementById('local_elevation_chart').offsetWidth!=document.getElementById('local_elevation_chart').children[0].offsetWidth)
+    initElevation(window.directionsResult,true,'local_elevation_chart');
+  if(charts[0]&&document.getElementById('elevation_chart').offsetWidth!=document.getElementById('elevation_chart').children[0].offsetWidth)
+    initElevation(window.directionsResult,false,'elevation_chart');
 }

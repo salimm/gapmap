@@ -26,14 +26,14 @@
               <div id="elevation">          	
     		  	<div id="elevation-container">
     		  		<div id="elevation_chart"></div>
-                    <div id="local_elevation_chart"></div>
+                    <div id="local_elevation_chart" style="display:none"></div>
                     <div id="charts-menu">
-                        <div >
+                        <div onclick="toggleChart('chart_overall')">
                         <input type="radio" name="radio" id="radio1" class="radio" checked/>
                         <label for="radio1">Overall Elevation</label>
                         </div>
 
-                        <div>
+                        <div onclick="toggleChart('chart_local')">
                         <input type="radio" name="radio" id="radio2" class="radio"/>
                         <label for="radio2">Local Elevation</label>
                         </div>
