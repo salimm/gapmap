@@ -23,6 +23,9 @@ var gelocationIsActive =false;
 var geointerval ;
 var centerSetOnce=false;
 var refreshSpeed = 1000 *60 *2;
+var myMarker = new google.maps.Marker({
+        icon: './img/gear.png',
+    });    
 
 var markersMap ;
 
@@ -460,6 +463,9 @@ function updateLocalInfo(){
   
   navigator.geolocation.getCurrentPosition(function(position) {
           myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
+          //update my marker
+          updateMyMarker(myLocation);
+
           if(!centerSetOnce){
             map.setCenter(myLocation);
             centerSetOnce=true;
@@ -473,6 +479,11 @@ function updateLocalInfo(){
         );
 }
 
+function updateMyMarker(myLocation){
+  myMarker.setPosition(myLocation);
+  if(!myMarker.map)
+    myMarker.setMap(map);
+}
 
 function toggleChart(id){
   hideAll();
