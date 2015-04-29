@@ -176,7 +176,7 @@ function emptyList(list){
 }
 
 function calcRoute() {
-    var start = 'Pittsburgh, Pa';
+    var start = 'Sennot Square, Pittsburgh, Pa';
     var end = 'Washington, DC';
     var request = {
         origin:start,
