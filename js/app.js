@@ -155,7 +155,7 @@ function createMaker(place,types,address){
                 return;
             }
             
-            infoWindow.setContent(result.nameinfoWindow.setContent(result.name+'<br><a href="https://www.google.com/maps/dir/current+location/'+marker.position.A+','+marker.position.F+'">Take me there!</a>'););
+            infoWindow.setContent(result.nameinfoWindow.setContent(result.name+'<br><a href="https://www.google.com/maps/dir/current+location/'+marker.position.A+','+marker.position.F+'">Take me there!</a>'));
             infoWindow.open(map, marker);
         });
     });
