@@ -12,21 +12,45 @@ var elevInfowindow = new google.maps.InfoWindow();
 MAX_DISTANCE = 10000;
 
 cities = ['Pittsburgh, PA', 'Homestead, PA','McKeesport,PA','Boston, PA','West Newton, PA','Connellsville, PA','Ohiopyle, PA','Confluence, PA','Rockwood, PA','Meyersdale, PA','Frostburg, MD','Cumberland, MD','Paw Paw, WV','Little Orleans, MD','Hancock, MD','Williamsport, MD', 'Shepherdstown, WV','Herpers Ferry, WV','Great Falls, VA', 'Washington, DC'];
-legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'}
+legend = {"Bike repair": './img/repair.png', 'Restaurant': './img/rest.png', 'Grocery': './img/groc.png', 'Camp area': './img/camp.png'};
 
 var geocoder;
 var weatherLayer;
 var cloudLayer;
 
+var markersMap ;
+
+// Load the Visualization API and the columnchart package.
+google.load('visualization', '1', {packages: ['columnchart']});
+var chart;
+var chartData;
+var chartMarker = new google.maps.Marker({
+        icon: './img/elevmarker.png',
+    });    
+
 
 function initialize() {
     geocoder = new google.maps.Geocoder();
+    initializeMarkersMap();
     currentLocation = new google.maps.LatLng(-34.397, 150.644);
-    success(undefined);
-    createLists(); 
-
     // Create an ElevationService
     elevator = new google.maps.ElevationService();
+    success(undefined);
+    createLists();     
+
+}
+
+function initGui(){ 
+  document.getElementById('collapse').onclick = toggleElevationContainer;
+}
+
+
+function initializeMarkersMap(){
+  markersMap = {};
+  for (var i = 0; i < cities.length; i++) {
+    var city = cities[i];
+    markersMap[city] = [];
+  }
 }
 
 function createLists(){
@@ -56,11 +80,20 @@ function createLists(){
 }
 
 function success(position) {
-    // currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);    
+    
+
     mapoptions = {
         center: currentLocation,
         zoom: 15,       
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN,google.maps.MapTypeId.SATELLITE],
+            style: google.maps.MapTypeControlStyle.DEFAULT
+        },
     };
+    chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
+    google.visualization.events.addListener(chart, 'onmouseover', chartMouseOver);
+    google.visualization.events.addListener(chart, 'onmouseout', chartMouseOut);
 
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
@@ -74,7 +107,8 @@ function success(position) {
     });
     cloudLayer = new google.maps.weather.CloudLayer();
 
-    // initializeMenu();
+    
+
 }
 
 function error(msg) {
@@ -82,15 +116,16 @@ function error(msg) {
 }
 
 
-function createMaker(place,types){
+function createMaker(place,types,address){
     var image = legend[types];
     
     var marker = new google.maps.Marker({
         position: place.geometry.location,
         map: map,
         title: place.name,
-        icon: image
-    });
+        icon: image,
+        types: types
+    });    
 
 
     google.maps.event.addListener(marker, 'click', function() {
@@ -106,15 +141,34 @@ function createMaker(place,types){
     });
     
     markers.push(marker);
+    if (markersMap[address]){
+      markersMap[address].push(marker);
+    }
 }
 
-function clearMakers(){
-    for (var i = 0; i < markers.length; i++) {
-        marker = markers[i];
-        marker.setMap(null);
+function displayMarkers(markers){
+  for (var i = 0; i < markers.length; i++) {
+    marker = markers[i];
+    marker.setMap(map);
+  }
+}
+
+function clearAllMakers(){
+    clearMakers(markers);
+    emptyList(markers);
+}
+
+function clearMakers(list){
+    for (var i = 0; i < list.length; i++) {
+        marker = list[i];
+        list[i].setMap(null);
     }
-    
-    markers = [];
+      
+}
+function emptyList(list){
+  while (list.length) { 
+      list.pop(); 
+    }
 }
 
 function calcRoute() {
@@ -126,10 +180,13 @@ function calcRoute() {
         travelMode: google.maps.TravelMode.BICYCLING
     };
 
+    
+
     directionsService.route(request, function(result, status) {    
         window.directionsResult = result;
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(result);
+            initElevation(result);
         }
     });
 }
@@ -161,7 +218,7 @@ function searchAt(element, type) {
                                 continue;
                             
                             tmp+="<li>"+place.name+" @ "+place.formatted_address+"</li>";
-                            createMaker(place, type);            
+                            createMaker(place, type,address);            
                         }
                     }
                     else {
@@ -174,12 +231,18 @@ function searchAt(element, type) {
     });
 }
 
-function showCity(element){
-   for (var key in legend) {
-        if (legend.hasOwnProperty(key)) {
-            searchAt(element, key);
-        }
-    } 
+function showCity(element){ 
+   if(element.checked && markersMap[element.value].length ===0){
+     for (var key in legend) {
+          if (legend.hasOwnProperty(key)) {
+              searchAt(element, key);
+          }
+      } 
+    }else if(element.checked){
+      displayMarkers(markersMap[element.value]);
+    }else{
+      clearMakers(markersMap[element.value]);
+    }
 }
 
 function calcDistance(p1, p2){
@@ -234,13 +297,11 @@ function toggleWeather(element) {
         weatherLayer.setMap(map);          
         cloudLayer.setMap(map);
     } else {
-        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-        google.maps.event.removeListener(elevListenerHanlde);
-
         weatherLayer.setMap(null);          
         cloudLayer.setMap(null);
     }
 }
+
 
 function toggleSidebar(val) {
     if (val) {
@@ -254,4 +315,99 @@ function toggleSidebar(val) {
         document.getElementById("toggle-button").classList.remove("open");
     }
     google.maps.event.trigger(map, "resize");
+}
+
+
+function initElevation(direc){
+  var route  = direc.routes[0];
+  var steps = route.legs[0].steps;
+  var path = [];
+  for (var i = 0; i < steps.length; i++) {
+    var step = steps[i];        
+    path.push(step.start_point);
+    path.push(step.end_point);
+  }
+
+   var pathRequest = {
+    'path': path,
+    'samples': 512
+  };
+
+  // Initiate the path request.
+  elevator.getElevationAlongPath(pathRequest, plotElevation);
+}
+
+
+
+
+function toggleElevationContainer(){
+
+  var element =document.getElementById('elevation-container');
+  console.log(element.className);
+  if(element.className =='visible-elev'){
+    element.className = '';   
+    chartMarker.setPosition(undefined);
+      chartMarker.setMap(undefined);
+  }else{    
+    element.className = 'visible-elev';
+
+  }
+}
+
+
+// Takes an array of ElevationResult objects, draws the path on the map
+// and plots the elevation profile on a Visualization API ColumnChart.
+function plotElevation(results, status) {
+  chartPath = results;
+  if (status != google.maps.ElevationStatus.OK) {
+    return;
+  }
+  var elevations = results;
+
+  // Extract the elevation samples from the returned results
+  // and store them in an array of LatLngs.
+  var elevationPath = [];
+  for (var i = 0; i < results.length; i++) {
+    elevationPath.push(elevations[i].location);
+  }
+
+  
+
+  // Extract the data from which to populate the chart.
+  // Because the samples are equidistant, the 'Sample'
+  // column here does double duty as distance along the
+  // X axis.
+  chartData = new google.visualization.DataTable();
+  chartData.addColumn('string', 'Sample');
+  chartData.addColumn('number', 'Elevation');
+
+  for (var i = 0; i < results.length; i++) {
+    chartData.addRow([results[i], elevations[i].elevation]);
+  }
+
+
+  // Draw the chart using the data within its DIV.
+  document.getElementById('elevation_chart').style.display = 'block';
+  var w=document.getElementById('elevation_chart').style.width;  
+  chart.draw(chartData, {
+    height: 150,
+    width:w,
+    legend: 'none',
+    titleY: 'Elevation (m)'
+  });
+  document.getElementById('GChart_Frame_0').style.width='100%';
+
+
+}
+
+
+function chartMouseOver(e){
+  chartMarker.setPosition(chartPath[e.row].location);
+  if(chartMarker.map === undefined)
+    chartMarker.setMap(map);
+
+}
+
+function chartMouseOut(e){
+
 }

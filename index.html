@@ -1,8 +1,10 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script src="https://www.google.com/jsapi"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=weather,places"></script>
-        <script type="text/javascript" src="js/app.js"></script>
+        <script type="text/javascript" src="js/app.js"></script>        
+        <script type="text/javascript" src="js/gui.js"></script>
     </head>
     <body>
         <div id="map-container" class="open">
@@ -20,10 +22,18 @@
             <ul id="legend-list" class="no-list"></ul>
 
             <button type="button" onclick="toggleSidebar(false)">Close Sidebar</button>
-        </div>
+        </div>          
+          <div id="elevation">          	
+		  	<div id="elevation-container">
+		  		<div id="elevation_chart"></div>
+		  	</div>
+		  	<div id="collapse" ><img src="./img/elev.png"></div>
+		  </div>
         <button type="button" class="open" id="toggle-button" onclick="toggleSidebar(true)">Show Sidebar</button>
         <script>
             initialize();
+            initGui();
+
         </script>
     </body>
 </html>
