@@ -41,6 +41,8 @@ var chartMarker = new google.maps.Marker({
         icon: './img/elevmarker.png',
     });    
 
+var tmpMarkers = [];
+
 
 function initialize() {
     geocoder = new google.maps.Geocoder();
@@ -111,8 +113,9 @@ function success(position) {
     myDirectionsDisplay = new google.maps.DirectionsRenderer({
     polylineOptions: {
       strokeColor: "red"
-    }
+    }    
   });
+    myDirectionsDisplay.setOptions( { suppressMarkers: true } );
     map = new google.maps.Map(document.getElementById("map"), mapoptions);
     directionsDisplay.setMap(map);
     myDirectionsDisplay.setMap(map);
@@ -162,6 +165,8 @@ function createMaker(place,types,address){
       markersMap[address].push(marker);
     }
 }
+
+
 
 function displayMarkers(markers){
   for (var i = 0; i < markers.length; i++) {
@@ -235,7 +240,7 @@ function searchAt(element, type) {
                                 continue;
                             
                             tmp+="<li>"+place.name+" @ "+place.formatted_address+"</li>";
-                            createMaker(place, type,address);            
+                            createMaker(place, type,address);
                         }
                     }
                     else {
@@ -563,6 +568,24 @@ function calcMyRoute(){
 
     
   }
+  if(!(minD < 10000 && minD > 30))
+    return;
+
+  var marker = new google.maps.Marker({
+        position: minLoc,
+        map: map,
+        title: "Trail ",
+        icon: undefined,
+    });    
+
+
+    google.maps.event.addListener(marker, 'click', function() {        
+          // infoWindow.setContent('Intersection with trail<br><a href="http://maps.google.com/maps?daddr='+minLoc.A+','+minLoc.A+'&amp;ll=">Take me there!</a>');
+          infoWindow.setContent('Intersection with trail<br><a href="https://www.google.com/maps/dir/current+location/'+minLoc.A+','+minLoc.F+'">Take me there!</a>');
+          
+          infoWindow.open(map, marker);        
+    });
+
 
     var request = {
         origin:myLocation,
