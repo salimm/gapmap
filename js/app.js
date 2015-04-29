@@ -18,6 +18,8 @@ var geocoder;
 var weatherLayer;
 var cloudLayer;
 
+var MY_MAPTYPE_ID = 'mymaps';
+
 
 function initialize() {
     geocoder = new google.maps.Geocoder();
@@ -56,12 +58,14 @@ function createLists(){
 }
 
 function success(position) {
-    // currentLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);    
+    
+
     mapoptions = {
         center: currentLocation,
         zoom: 15,       
         mapTypeControlOptions: {
-            mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
+            mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN,google.maps.MapTypeId.SATELLITE],
+            style: google.maps.MapTypeControlStyle.DEFAULT
         },
     };
 
@@ -78,7 +82,7 @@ function success(position) {
     });
     cloudLayer = new google.maps.weather.CloudLayer();
 
-    // initializeMenu();
+
 }
 
 function error(msg) {
