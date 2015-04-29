@@ -26,6 +26,8 @@ var refreshSpeed = 1000 *60 *2;
 var myMarker = new google.maps.Marker({
         icon: './img/gear.png',
     });    
+var myDirectionsDisplay;
+var myDirectionsService = new google.maps.DirectionsService();
 
 var markersMap ;
 
@@ -106,8 +108,15 @@ function success(position) {
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
     directionsDisplay = new google.maps.DirectionsRenderer();
+    myDirectionsDisplay = new google.maps.DirectionsRenderer({
+    polylineOptions: {
+      strokeColor: "red"
+    }
+  });
     map = new google.maps.Map(document.getElementById("map"), mapoptions);
     directionsDisplay.setMap(map);
+    myDirectionsDisplay.setMap(map);
+
     calcRoute();
 
     weatherLayer = new google.maps.weather.WeatherLayer({
@@ -180,7 +189,7 @@ function emptyList(list){
 }
 
 function calcRoute() {
-    var start = 'Sennot Square, Pittsburgh, Pa';
+    var start = 'Pittsburgh, Pa';
     var end = 'Washington, DC';
     var request = {
         origin:start,
@@ -335,7 +344,7 @@ function initElevation(direc,limitDistance,elementId){
     if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
       path.push(step.start_point);
     }
-    if(!limitDistance || calcDistance(step.start_point,myLocation)< MAX_DISTANCE){
+    if(!limitDistance || calcDistance(step.end_point,myLocation)< MAX_DISTANCE){
       path.push(step.end_point);
     }
   }
@@ -463,6 +472,7 @@ function updateLocalInfo(){
   
   navigator.geolocation.getCurrentPosition(function(position) {
           myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude); 
+          calcMyRoute();
           //update my marker
           updateMyMarker(myLocation);
 
@@ -525,4 +535,49 @@ function toggleSpeed(){
     geointerval = setInterval(function(){ 
         updateLocalInfo();
       }, refreshSpeed);
+}
+
+
+function calcMyRoute(){
+  var route  = window.directionsResult.routes[0];
+  var steps = route.legs[0].steps;
+
+  var minLoc;
+  var minStep;
+  var minD = 999999999;
+  for (var i = 0; i < steps.length; i++) {    
+
+    var step = steps[i];        
+    var d = parseInt(calcDistance(step.start_point,myLocation));
+    if(d < minD){
+      minD = d;
+      minLoc =  step.start_point;  
+      minStep = step;   
+    }
+    d = parseInt(calcDistance(step.end_point,myLocation));
+    if(d< minD){
+      minD = d;
+      minLoc =  step.end_point;   
+      minStep = step;  
+    }
+
+    
+  }
+
+    var request = {
+        origin:myLocation,
+        destination:minLoc,
+        travelMode: google.maps.TravelMode.BICYCLING,
+
+    };
+
+    
+
+    myDirectionsService.route(request, function(result, status) {    
+        
+        if (status == google.maps.DirectionsStatus.OK) {
+            myDirectionsDisplay.setDirections(result);
+            
+        }
+    });
 }
