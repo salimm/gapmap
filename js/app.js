@@ -22,6 +22,11 @@ var markersMap ;
 
 // Load the Visualization API and the columnchart package.
 google.load('visualization', '1', {packages: ['columnchart']});
+var chart;
+var chartData;
+var chartMarker = new google.maps.Marker({
+        icon: './img/elevmarker.png',
+    });    
 
 
 function initialize() {
@@ -84,6 +89,8 @@ function success(position) {
         },
     };
     chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
+    google.visualization.events.addListener(chart, 'onmouseover', chartMouseOver);
+    google.visualization.events.addListener(chart, 'onmouseout', chartMouseOut);
 
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
@@ -319,7 +326,7 @@ function initElevation(direc){
 
    var pathRequest = {
     'path': path,
-    'samples': 256
+    'samples': 512
   };
 
   // Initiate the path request.
@@ -331,6 +338,7 @@ function initElevation(direc){
 // Takes an array of ElevationResult objects, draws the path on the map
 // and plots the elevation profile on a Visualization API ColumnChart.
 function plotElevation(results, status) {
+  chartPath = results;
   if (status != google.maps.ElevationStatus.OK) {
     return;
   }
@@ -349,21 +357,37 @@ function plotElevation(results, status) {
   // Because the samples are equidistant, the 'Sample'
   // column here does double duty as distance along the
   // X axis.
-  var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Sample');
-  data.addColumn('number', 'Elevation');
+  chartData = new google.visualization.DataTable();
+  chartData.addColumn('string', 'Sample');
+  chartData.addColumn('number', 'Elevation');
+
   for (var i = 0; i < results.length; i++) {
-    data.addRow(['', elevations[i].elevation]);
+    chartData.addRow([results[i], elevations[i].elevation]);
   }
+
 
   // Draw the chart using the data within its DIV.
   document.getElementById('elevation_chart').style.display = 'block';
   var w=document.getElementById('elevation_chart').style.width;  
-  chart.draw(data, {
+  chart.draw(chartData, {
     height: 150,
     width:w,
     legend: 'none',
     titleY: 'Elevation (m)'
   });
   document.getElementById('GChart_Frame_0').style.width='100%';
+
+
+}
+
+
+function chartMouseOver(e){
+  chartMarker.setPosition(chartPath[e.row].location);
+  chartMarker.setMap(map);
+
+}
+
+function chartMouseOut(e){
+  chartMarker.setPosition(undefined);
+  chartMarker.setMap(undefined);
 }
