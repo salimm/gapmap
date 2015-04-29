@@ -190,7 +190,7 @@ function calcRoute() {
         window.directionsResult = result;
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(result);
-            initElevation(result,false);
+            initElevation(result,false,'elevation_chart');
         }
     });
 }
@@ -322,7 +322,7 @@ function toggleSidebar(val) {
 }
 
 
-function initElevation(direc,limitDistance){
+function initElevation(direc,limitDistance,elementId){
   var route  = direc.routes[0];
   var steps = route.legs[0].steps;
   var path = [];
@@ -342,7 +342,7 @@ function initElevation(direc,limitDistance){
   };
 
   // Initiate the path request.
-  elevator.getElevationAlongPath(pathRequest, function(results,status){plotElevation(results,status,'elevation_chart');});
+  elevator.getElevationAlongPath(pathRequest, function(results,status){plotElevation(results,status,elementId);});
 }
 
 
@@ -394,6 +394,7 @@ function plotElevation(results, status,elementId) {
   }
 
 
+
   // Draw the chart using the data within its DIV.
   document.getElementById(elementId).style.display = 'block';
   var w=document.getElementById(elementId).style.width;  
@@ -427,9 +428,11 @@ function toggleGeolocation(){
 
     geointerval = setInterval(function(){ 
       updateLocalInfo();
+
     }, 1000);
   }else{
     clearInterval(geointerval);
+    map.setZoom(7);
   }
 }
 
@@ -438,8 +441,10 @@ function updateLocalInfo(){
   navigator.geolocation.getCurrentPosition(function(position) {
           myLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
           map.setCenter(myLocation);
+          map.setZoom(13);
+          initElevation(window.directionsResult,true,'local_elevation_chart');
         }, function() {
-            handleNoGeolocation(browserSupportFlag);
+            alert('no geo');
           } 
         );
 }
