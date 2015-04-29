@@ -1,13 +1,16 @@
-$(document).ready(function(){
+function initGui(){	
+	document.getElementById('collapse').onclick = toggleElevationContainer;
+}
 
-	$("#collapse").click(toggleElevationContainer);
-});
 
 
-function toggleElevationContainer(){	
-	if($('#elevation-container').hasClass('visible-elev')){
-		$('#elevation-container').removeClass('visible-elev');
+function toggleElevationContainer(){
+
+	var element =document.getElementById('elevation-container');
+	console.log(element.className);
+	if(element.className =='visible-elev'){
+		element.className = '';		
 	}else{		
-		$('#elevation-container').addClass('visible-elev');
+		element.className = 'visible-elev';
 	}
 }

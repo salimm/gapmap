@@ -20,16 +20,20 @@ var cloudLayer;
 
 var markersMap ;
 
+// Load the Visualization API and the columnchart package.
+google.load('visualization', '1', {packages: ['columnchart']});
+
 
 function initialize() {
     geocoder = new google.maps.Geocoder();
     initializeMarkersMap();
     currentLocation = new google.maps.LatLng(-34.397, 150.644);
-    success(undefined);
-    createLists(); 
-
     // Create an ElevationService
     elevator = new google.maps.ElevationService();
+    success(undefined);
+    createLists();     
+
+    
 
 }
 
@@ -79,7 +83,7 @@ function success(position) {
             style: google.maps.MapTypeControlStyle.DEFAULT
         },
     };
-
+    chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
 
     map = new google.maps.Map(document.getElementById('map'), mapoptions);
     infoWindow = new google.maps.InfoWindow();
@@ -93,6 +97,7 @@ function success(position) {
     });
     cloudLayer = new google.maps.weather.CloudLayer();
 
+    
 
 }
 
@@ -165,10 +170,13 @@ function calcRoute() {
         travelMode: google.maps.TravelMode.BICYCLING
     };
 
+    
+
     directionsService.route(request, function(result, status) {    
         window.directionsResult = result;
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(result);
+            initElevation(result);
         }
     });
 }
@@ -297,4 +305,63 @@ function toggleSidebar(val) {
         document.getElementById("toggle-button").classList.remove("open");
     }
     google.maps.event.trigger(map, "resize");
+}
+
+
+function initElevation(direc){
+  var route  = direc.routes[0];
+  var steps = route.legs[0].steps;
+  var path = [];
+  for (var i = 0; i < steps.length; i++) {
+    var step = steps[i];
+    path.push(step.start_point);
+  }
+
+   var pathRequest = {
+    'path': path,
+    'samples': 256
+  };
+
+  // Initiate the path request.
+  elevator.getElevationAlongPath(pathRequest, plotElevation);
+}
+
+
+
+// Takes an array of ElevationResult objects, draws the path on the map
+// and plots the elevation profile on a Visualization API ColumnChart.
+function plotElevation(results, status) {
+  if (status != google.maps.ElevationStatus.OK) {
+    return;
+  }
+  var elevations = results;
+
+  // Extract the elevation samples from the returned results
+  // and store them in an array of LatLngs.
+  var elevationPath = [];
+  for (var i = 0; i < results.length; i++) {
+    elevationPath.push(elevations[i].location);
+  }
+
+  
+
+  // Extract the data from which to populate the chart.
+  // Because the samples are equidistant, the 'Sample'
+  // column here does double duty as distance along the
+  // X axis.
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Sample');
+  data.addColumn('number', 'Elevation');
+  for (var i = 0; i < results.length; i++) {
+    data.addRow(['', elevations[i].elevation]);
+  }
+
+  // Draw the chart using the data within its DIV.
+  document.getElementById('elevation_chart').style.display = 'block';
+  chart.draw(data, {
+    height: 150,
+    width:'100%',
+    legend: 'none',
+    titleY: 'Elevation (m)'
+  });
 }

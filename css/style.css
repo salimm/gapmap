@@ -58,7 +58,7 @@ button{
 }
 
 #collapse{
-  width: 3vw;
+  width: 2.7vw;
   font-size: 2%;
   
   
@@ -97,5 +97,9 @@ button{
   
   float: right;
   margin-top: -25.3vh;
-  margin-right: -3.1vw;
+  margin-right: -2.8vw;
+}
+
+#elevation_chart{
+    width:100%;
 }
