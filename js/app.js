@@ -155,7 +155,7 @@ function createMaker(place,types,address){
                 return;
             }
             
-            infoWindow.setContent(result.name+'<br><a href="https://www.google.com/maps/dir/current+location/'+marker.position.A+','+marker.position.F+'">Take me there!</a>');
+            infoWindow.setContent('<p class="markerinfo">'+result.name+'<br><a href="https://www.google.com/maps/dir/current+location/'+marker.position.A+','+marker.position.F+'">Take me there!</a></p>');
             infoWindow.open(map, marker);
         });
     });
@@ -581,7 +581,7 @@ function calcMyRoute(){
 
     google.maps.event.addListener(marker, 'click', function() {        
           // infoWindow.setContent('Intersection with trail<br><a href="http://maps.google.com/maps?daddr='+minLoc.A+','+minLoc.A+'&amp;ll=">Take me there!</a>');
-          infoWindow.setContent('Intersection with trail<br><a href="https://www.google.com/maps/dir/current+location/'+minLoc.A+','+minLoc.F+'">Take me there!</a>');
+          infoWindow.setContent('<p class="markerinfo">'+'Intersection with trail<br><a href="https://www.google.com/maps/dir/current+location/'+minLoc.A+','+minLoc.F+'">Take me there!</a></p>');
           
           infoWindow.open(map, marker);        
     });
