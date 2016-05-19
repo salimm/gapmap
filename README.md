@@ -1,6 +1,6 @@
 # The Great Allegany Passage Map 
 
-My friends and I did the GAP biking trail May 2015 and it was a great experience. However, to make planning for the trip easier we made this interactive information map for the trai to help finding shops of various kinds, wheather, elevation information and etc. as easy as possible for different locations on the map. I hoe you find it useful.
+My friends and I did the GAP biking trail May 2015 and it was a great experience. However, to make planning for the trip easier we made this interactive information map for the trai to help finding shops of various kinds, wheather, elevation information and etc. as easy as possible for different locations on the map. I hope you find it useful.
 
 This app helps you find the closest repair shops, camping grounds and restaurants on the GAP trail to help you plan the next leg of your trip better. Shows elevation map and weather reports as well.
 
