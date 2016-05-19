@@ -21,3 +21,5 @@ Hope you enjoy it and find it useful
 
 My friend wrote a blog post about our trip here: [blog](http://www.trivedigaurav.com/blog/bike-ride-from-pittsburgh-to-washington-dc/)
 
+![Snapshot ](https://raw.githubusercontent.com/salimm/gapmap/master/gapmap.png)
+
