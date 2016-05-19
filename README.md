@@ -19,5 +19,5 @@ If you decided to shareembed it on your website ** Please cite the orginal URL p
 
 Hope you enjoy it and find it useful
 
-Some pictures from our trip:
+My friend wrote a blog post about our trip here: [blog](http://www.trivedigaurav.com/blog/bike-ride-from-pittsburgh-to-washington-dc/)
 
