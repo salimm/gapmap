@@ -1,4 +1,4 @@
-# The Great Allegany Passage Map 
+# The Great Alleghany Passage Map 
 
 My friends and I did the GAP biking trail May 2015 and it was a great experience. However, to make planning for the trip easier we made this interactive information map for the trai to help finding shops of various kinds, wheather, elevation information and etc. as easy as possible for different locations on the map. I hope you find it useful.
 
