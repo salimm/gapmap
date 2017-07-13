@@ -1,4 +1,5 @@
 You may also check out https://gaptrail.org/explore as an alternative to this app. 
+
 This app works great on a mobile browser as well.
 
 _____
